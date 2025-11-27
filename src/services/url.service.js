@@ -22,9 +22,10 @@ export const getUrlByCode = async (shortCode) => {
   if (urlRecord) {
     await prisma.url.update({
       where: { id: urlRecord.id },
-      data: { clicks: urlRecord.clicks + 1 },
+      data: {
+        clicks: urlRecord.clicks + 1,
+      },
     });
   }
-
   return urlRecord;
 };
