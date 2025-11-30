@@ -29,3 +29,9 @@ export const getUrlByCode = async (shortCode) => {
   }
   return urlRecord;
 };
+
+export const getUrlStats = async (shortCode) => {
+  return await prisma.url.findUnique({
+    where: { shortCode },
+  });
+};

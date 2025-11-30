@@ -13,10 +13,11 @@ export const shorten = async (req, res) => {
     const createdUrl = await urlService.createShortUrl(originalUrl);
 
     const baseUrl = `${req.protocol}://${req.get('host')}`;
+
     res.status(201).json({
-      originalUrl: createUrl.originalUrl,
-      shortCode: createUrl.shortCode,
-      shortUrl: `${baseUrl}/${createUrl.shortCode}`,
+      originalUrl: createdUrl.originalUrl,
+      shortCode: createdUrl.shortCode,
+      shortUrl: `${baseUrl}/${createdUrl.shortCode}`,
     });
   } catch (error) {
     console.error(error);
@@ -42,5 +43,27 @@ export const redirectToOriginal = async (req, res) => {
     res.status(500).json({
       error: 'Server error',
     });
+  }
+};
+
+export const getStats = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const urlRecord = await urlService.getUrlStats(code);
+
+    if (!urlRecord) {
+      return res.status(404).json({ error: 'URL not found' });
+    }
+
+    res.json({
+      originalUrl: urlRecord.originalUrl,
+      shortCode: urlRecord.shortCode,
+      clicks: urlRecord.clicks,
+      createdAt: urlRecord.createdAt,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
   }
 };
