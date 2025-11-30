@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeAlpha URL Shortener</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        color: #0f2035;
+      }
+      h1 {
+        color: #234d84;
+        margin-bottom: 1.5rem;
+      }
+      input {
+        width: 80%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        transition: 0.3s;
+      }
+      input:focus {
+        border-color: #234d84;
+      }
+      button {
+        background: #234d84;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: 0.3s;
+      }
+      button:hover {
+        background: #234d84;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e8f0fe;
+        border-radius: 8px;
+        display: none;
+        word-break: break-all;
+      }
+      .error {
+        color: red;
+        margin-top: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>URL Shortener</h1>
+      <p>Enter a long URL to get a short link</p>
+      <input type="url" id="longUrl" placeholder="https://example.com/very-long-url..." required />
+      <br />
+      <button onclick="shortenUrl()">Shorten URL</button>
+
+      <div id="result">
+        <p>Success! Here is your short link:</p>
+        <a id="shortLink" href="#" target="_blank" style="font-weight: bold; font-size: 18px"></a>
+      </div>
+      <p id="errorMsg" class="error"></p>
+    </div>
+
+    <script>
+      async function shortenUrl() {
+        const originalUrl = document.getElementById('longUrl').value;
+        const resultBox = document.getElementById('result');
+        const errorBox = document.getElementById('errorMsg');
+        const linkTag = document.getElementById('shortLink');
+
+        resultBox.style.display = 'none';
+        errorBox.style.display = 'none';
+
+        if (!originalUrl) return;
+
+        try {
+          const response = await fetch('http://localhost:3000/shorten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ originalUrl }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            linkTag.href = data.shortUrl;
+            linkTag.textContent = data.shortUrl;
+            resultBox.style.display = 'block';
+          } else {
+            errorBox.textContent = data.error || 'Something went wrong';
+            errorBox.style.display = 'block';
+          }
+        } catch (err) {
+          errorBox.textContent = 'Server error. Is backend running?';
+          errorBox.style.display = 'block';
+        }
+      }
+    </script>
+  </body>
+</html>
